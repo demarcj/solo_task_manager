@@ -34,7 +34,7 @@ export const MainSection = () => {
     <main>
       <Timer />
       <Box className="app-shell">
-        <Box component="main">
+        <Box component="div">
           <Container className="hero" maxWidth="lg">
             <Box>
               <Box>
