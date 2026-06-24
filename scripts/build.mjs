@@ -55,5 +55,3 @@ const html = htmlTemplate
   .replace('<!-- APP_JS -->', () => jsBundle.text);
 
 await writeFile(join(distDir, 'index.html'), html, 'utf8');
-
-console.log(`Built ${join(distDir, 'index.html')}`);
