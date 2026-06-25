@@ -1,6 +1,20 @@
-import { MainSection } from './components/main/main_section';
+import { Homepage } from './components/main/homepage';
+import { TaskPage } from "./components/main/task_page";
 import { useSignals, useSignal } from "@preact/signals-react/runtime";
-import { StartPrompt } from "./components/dialog/start_prompt"
+import { StartPrompt } from "./components/dialog/start_prompt";
+import { Timer } from "./components/standalones/timer"
+import { Router, type AppRoute } from './router';
+
+const routes: AppRoute[] = [
+  {
+    path: '/',
+    component: Homepage
+  },
+  {
+    path: '/task',
+    component: TaskPage
+  }
+];
 
 function App() {
   useSignals();
@@ -13,7 +27,10 @@ function App() {
         onClose={() => is_start_prompt_open.value = false}
       />
       <header></header>
-      <MainSection />
+      <main className="app-shell">
+        <Timer />
+        <Router routes={routes} fallback={Homepage} />
+      </main>
       <footer></footer>
     </div>
   );
