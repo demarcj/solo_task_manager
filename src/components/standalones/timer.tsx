@@ -1,4 +1,3 @@
-"use client";
 import {
   Box,
   Button,
@@ -113,7 +112,6 @@ const save_timer = (total_seconds: number) => {
 const start_time = signal<number | null>(null);
 const saved_seconds = signal(0);
 const display_time = signal('-- : -- : --');
-// const [display_time, set_display_time] = useState()
 const is_timer_ready = signal(false);
 
 const setup_timer = () => {
