@@ -42,14 +42,22 @@ export const Homepage = () => {
                 React SPA + Material UI
               </Typography>
               <Typography variant="h1" className="hero-title">
-                A clean starting point for art, ideas, and interpretation.
+                Weekly Progress
               </Typography>
               <Typography variant="body1" className="hero-copy">
-                This starter app is wired with React, Vite, and Material UI so it can run locally
-                during development and build to static HTML assets for deployment.
+                1 hr
+              </Typography>
+              <Typography variant="h2" className="hero-title">
+                Yesterday Progress
+              </Typography>
+              <Typography variant="body1" className="hero-copy">
+                1 hr
+              </Typography>
+              <Typography variant="h2" className="hero-title">
+                Task
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} className="hero-actions">
-                <Button component={NextLink} href="/task" variant="contained" size="large">
+                <Button component={NextLink} href="/task/111111" variant="contained" size="large">
                   Explore Topics
                 </Button>
                 <Button variant="outlined" size="large">

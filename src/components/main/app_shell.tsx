@@ -27,12 +27,8 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
               is_start_prompt_open.value = false;
             }}
           />
-          <header />
-          <main className="app-shell">
-            <Timer />
-            {children}
-          </main>
-          <footer />
+          <Timer />
+          {children}
         </>
       )}
     </>
