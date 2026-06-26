@@ -1,3 +1,4 @@
+"use client";
 import {
   Box,
   Button,
@@ -5,26 +6,21 @@ import {
   Paper,
   Typography
 } from '@mui/material';
-import { useSignals } from '@preact/signals-react/runtime';
+import { useSignals, useSignal } from '@preact/signals-react/runtime';
 import { effect, signal } from '@preact/signals-react';
+import { useState } from 'react';
 import { is_start } from "../../hooks/timer_hooks";
 
 const timer_storage_key = 'timer_history';
+
+const get_browser_window = () => globalThis.window;
 
 interface TimerHistoryEntry {
   timer: string;
   unformatted_time: number;
 }
 
-const seconds_since = (start_time: TemporalInstant) => {
-  const duration = start_time.until(Temporal.Now.instant(), {
-    largestUnit: 'hours',
-    smallestUnit: 'seconds',
-    roundingMode: 'floor'
-  });
-
-  return (duration.hours * 60 * 60) + (duration.minutes * 60) + duration.seconds;
-};
+const seconds_since = (start_time: number) => Math.floor((Date.now() - start_time) / 1000);
 
 const format_time = (total_seconds: number) => {
   const hours = Math.floor(total_seconds / 3600);
@@ -36,7 +32,7 @@ const format_time = (total_seconds: number) => {
     .join(' : ');
 };
 
-const get_today = () => Temporal.Now.plainDateISO().toString();
+const get_today = () => new Date().toISOString().slice(0, 10);
 
 const parse_timer_seconds = (timer: string) => {
   const [hours, minutes, seconds] = timer
@@ -51,7 +47,13 @@ const parse_timer_seconds = (timer: string) => {
 };
 
 const read_timer_history = () => {
-  const stored_timers = localStorage.getItem(timer_storage_key);
+  const browser_window = get_browser_window();
+
+  if (!browser_window) {
+    return {};
+  }
+
+  const stored_timers = browser_window.localStorage.getItem(timer_storage_key);
   let timers_by_date: Record<string, TimerHistoryEntry | string> = {};
 
   if (stored_timers) {
@@ -88,10 +90,16 @@ const get_saved_seconds_for_today = () => {
 };
 
 const save_timer = (total_seconds: number) => {
+  const browser_window = get_browser_window();
+
+  if (!browser_window) {
+    return;
+  }
+
   const today = get_today();
   const timers_by_date = read_timer_history();
 
-  localStorage.setItem(
+  browser_window.localStorage.setItem(
     timer_storage_key,
     JSON.stringify({
       ...timers_by_date,
@@ -103,65 +111,80 @@ const save_timer = (total_seconds: number) => {
   );
 };
 
-const start_time = signal<TemporalInstant | null>(null);
-const saved_seconds = signal(get_saved_seconds_for_today());
-const display_time = signal(saved_seconds.peek() > 0 ? format_time(saved_seconds.peek()) : '-- : -- : --');
+const start_time = signal<number | null>(null);
+const saved_seconds = signal(0);
+const display_time = signal('-- : -- : --');
+// const [display_time, set_display_time] = useState()
+const is_timer_ready = signal(false);
 
-effect(() => {
-  if (!is_start.value) {
-    const paused_start_time = start_time.peek();
+const setup_timer = () => {
+  const browser_window = get_browser_window();
 
-    if (paused_start_time) {
-      saved_seconds.value = saved_seconds.peek() + seconds_since(paused_start_time);
-      display_time.value = format_time(saved_seconds.peek());
-      save_timer(saved_seconds.peek());
-    }
-
-    start_time.value = null;
+  if (!browser_window || is_timer_ready.peek()) {
     return;
   }
 
-  start_time.value = start_time.peek() ?? Temporal.Now.instant();
+  saved_seconds.value = get_saved_seconds_for_today();
+  display_time.value = saved_seconds.peek() > 0 ? format_time(saved_seconds.peek()) : '-- : -- : --';
+  is_timer_ready.value = true;
 
-  const update_time = () => {
-    const running_start_time = start_time.peek();
+  effect(() => {
+    if (!is_start.value) {
+      const paused_start_time = start_time.peek();
 
-    if (running_start_time) {
-      display_time.value = format_time(saved_seconds.peek() + seconds_since(running_start_time));
+      if (paused_start_time) {
+        saved_seconds.value = saved_seconds.peek() + seconds_since(paused_start_time);
+        display_time.value = format_time(saved_seconds.peek());
+        save_timer(saved_seconds.peek());
+      }
+
+      start_time.value = null;
+      return;
     }
-  };
 
-  update_time();
+    start_time.value = start_time.peek() ?? Date.now();
 
-  const interval_id = window.setInterval(update_time, 1000);
+    const update_time = () => {
+      const running_start_time = start_time.peek();
 
-  return () => window.clearInterval(interval_id);
-});
+      if (running_start_time) {
+        display_time.value = format_time(saved_seconds.peek() + seconds_since(running_start_time));
+      }
+    };
 
-effect(() => {
-  if (!is_start.value) {
-    return;
-  }
+    update_time();
 
-  const warn_before_close = (event: BeforeUnloadEvent) => {
-    event.preventDefault();
-    event.returnValue = '';
-  };
+    const interval_id = browser_window.setInterval(update_time, 1000);
 
-  window.addEventListener('beforeunload', warn_before_close);
+    return () => browser_window.clearInterval(interval_id);
+  });
 
-  return () => window.removeEventListener('beforeunload', warn_before_close);
-});
+  effect(() => {
+    if (!is_start.value) {
+      return;
+    }
+
+    const warn_before_close = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+
+    browser_window.addEventListener('beforeunload', warn_before_close);
+
+    return () => browser_window.removeEventListener('beforeunload', warn_before_close);
+  });
+};
 
 export const Timer = () => {
   useSignals();
+  setup_timer();
 
   return (
     <Box className="time_box">
       <Paper className="quote-panel" elevation={0}>
-        <Typography variant="h2">Time </Typography>
+        <Typography variant="h2">Time</Typography>
         <Divider />
-        <Typography variant="body1" sx={{pb: `15px`}}>
+        <Typography variant="body1" className='timer'>
           {display_time.value}
         </Typography>
         <Button 

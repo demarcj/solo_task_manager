@@ -1,12 +1,14 @@
+'use client';
+
 import {
   Box,
   Button,
   Container,
-  Link,
   Paper,
   Stack,
   Typography
 } from '@mui/material';
+import NextLink from 'next/link';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import BrushIcon from '@mui/icons-material/Brush';
 import PaletteIcon from '@mui/icons-material/Palette';
@@ -47,7 +49,7 @@ export const Homepage = () => {
                 during development and build to static HTML assets for deployment.
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} className="hero-actions">
-                <Button component={Link} href="/task" variant="contained" size="large">
+                <Button component={NextLink} href="/task" variant="contained" size="large">
                   Explore Topics
                 </Button>
                 <Button variant="outlined" size="large">
