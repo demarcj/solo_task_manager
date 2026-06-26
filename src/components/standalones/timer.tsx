@@ -8,7 +8,6 @@ import {
 } from '@mui/material';
 import { useSignals, useSignal } from '@preact/signals-react/runtime';
 import { effect, signal } from '@preact/signals-react';
-import { useState } from 'react';
 import { is_start } from "../../hooks/timer_hooks";
 
 const timer_storage_key = 'timer_history';
