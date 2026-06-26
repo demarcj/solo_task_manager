@@ -1,5 +1,3 @@
-'use client';
-
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import type { ReactNode } from 'react';
 

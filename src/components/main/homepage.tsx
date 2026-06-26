@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Box,
   Button,
@@ -8,10 +6,10 @@ import {
   Stack,
   Typography
 } from '@mui/material';
-import NextLink from 'next/link';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import BrushIcon from '@mui/icons-material/Brush';
 import PaletteIcon from '@mui/icons-material/Palette';
+import { AppLink } from '@/router';
 
 const topics = [
   {
@@ -57,7 +55,7 @@ export const Homepage = () => {
                 Task
               </Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} className="hero-actions">
-                <Button component={NextLink} href="/task/111111" variant="contained" size="large">
+                <Button component={AppLink} href="/task/111111" variant="contained" size="large">
                   Explore Topics
                 </Button>
                 <Button variant="outlined" size="large">
