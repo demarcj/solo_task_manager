@@ -26,6 +26,10 @@ body {
   width: 100%;
 }
 
+.timer{
+  padding-block-end: 15px;
+}
+
 .brand-mark {
   display: grid;
   place-items: center;

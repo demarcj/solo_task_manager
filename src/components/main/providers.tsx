@@ -1,8 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+'use client';
+
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
-import App from './App';
-import './style.css';
+import type { ReactNode } from 'react';
 
 const theme = createTheme({
   palette: {
@@ -34,17 +33,11 @@ const theme = createTheme({
   }
 });
 
-const root = document.getElementById('root');
-
-if (!root) {
-  throw new Error('Root element #root was not found.');
-}
-
-ReactDOM.createRoot(root).render(
-  <React.StrictMode>
+export const Providers = ({ children }: { children: ReactNode }) => {
+  return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <App />
+      {children}
     </ThemeProvider>
-  </React.StrictMode>
-);
+  );
+};
